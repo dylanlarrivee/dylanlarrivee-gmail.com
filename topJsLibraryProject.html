@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>The HTML5 Herald</title>
+    <meta name="description" content="The HTML5 Herald" />
+    <meta name="author" content="SitePoint" />
+    <style>
+      h4 {
+        text-align: center;
+        background-color: rgba(45, 45, 45, 0.1);
+        padding: 10px;
+        font-size: 27px;
+      }
+      p {
+        text-align: justify;
+      }
+      .links {
+        text-align: left;
+        color: black;
+        opacity: 0.7;
+      }
+      #thumbnail {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19),
+          0 6px 6px rgba(0, 0, 0, 0.23);
+      }
+      .fullCard {
+        width: 245px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: 10px 5px;
+        padding: 4px;
+      }
+      .cardContent {
+        padding: 10px;
+      }
+      .cardText {
+        margin-bottom: 30px;
+      }
+    </style>
+    <!-- Table -->
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+    </style>
+    <!-- 
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+-->
+  </head>
+  <header>
+    <h1>Movie Library</h1>
+  </header>
+  <body>
+      <form id="add-movie-form">
+    <div id="card-grid">
+      <div class="fullCard" id="thumbnail">
+        <div class="cardContent">
+          <div class="cardText">
+            <h4 id="movie-name">Add a Movie</h4>
+           
+            <hr />
+            <p id="movie-description">
+              <em>Enter in the below info to add a movie to your library</em>
+            </p>
+          </div>
+          <div class="cardLinks">
+            <div><strong>Movie Name:</strong></div>
+            <input type="text" id="movie-title" />
+            <div><strong>Director Name:</strong></div>
+            <input type="text" id="movie-director" />
+            <div><strong>Movie Length (in minutes):</strong></div>
+            <input type="text" id="movie-length" />
+            <div><strong>Have you watched?:</strong></div>
+            <select id="movie-watched" name="movie-watched">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            <br /><br />
+            <input type="submit" value="Submit" id="submitButton" />
+          </div>
+        </div>
+      </div>
+    </div>
+</form>
+
+    <h2>HTML Table</h2>
+    <table id="movie-table">
+      <thead>
+        <tr>
+          <th>Movie Name</th>
+          <th>Director Name</th>
+          <th>Movie Length (in minutes)</th>
+          <th>Have watched?</th>
+          <th>Delete?</th>
+        </tr>
+      </thead>
+      <tbody>
+        </tr>
+      </tbody>
+    </table>
+    <!-- <script src="js/scripts.js"></script> -->
+    <script>
+        const movieListArr = [];
+        const testMovie1 = new Movie("Jumangi Next Level", "that one guy", 120, false, 0);
+        const testMovie2 = new Movie("That movie name", "that director", 140, true, 1);
+        movieListArr.push(testMovie1, testMovie2);
+
+        document.getElementById('add-movie-form').onsubmit = function() { 
+            let movieTitle = document.getElementById('movie-title').value;
+            let movieDirector = document.getElementById('movie-director').value;
+            let movieLength = document.getElementById('movie-length').value;
+            let movieWatched = (document.getElementById('movie-watched').value === "Yes" ? true : false);
+
+            let id = 0;
+            if(movieListArr[movieListArr.length-1] !== undefined) {
+                id = movieListArr[movieListArr.length-1].id
+                id++
+            }
+
+            let newMovie = new Movie(movieTitle, movieDirector, movieLength, movieWatched, id);
+            movieListArr.push(newMovie);
+            insertNewMovie(movieListArr.length-1);
+            document.getElementById('add-movie-form').reset();
+            return false
+
+        };
+        const addMovie = function() {
+            movieListArr.push(testMovie1);
+        }
+
+        // Creating and updating new rows / cells in movie table
+        const tableRef = document.getElementById('movie-table').getElementsByTagName('tbody')[0];
+        function loadMovies() {
+            for (let i=0; i<movieListArr.length; i++) {
+                insertNewMovie(i);
+                }
+        }
+        
+        function insertNewMovie(pos) {            
+            let newRow   = tableRef.insertRow();
+            newRow.setAttribute("id",movieListArr[pos].id);
+                // Insert a cell in the row at index 0
+                let newTitleCell  = newRow.insertCell(0);
+                let newDirectorCell  = newRow.insertCell(1);
+                let newLengthCell  = newRow.insertCell(2);
+                let newWatchedCell  = newRow.insertCell(3);
+                let newDeleteCell  = newRow.insertCell(4);
+                // Append a text node to the cell
+                let newTitleText  = document.createTextNode(movieListArr[pos].name);
+                newTitleCell.appendChild(newTitleText);
+
+                let newDirectorText  = document.createTextNode(movieListArr[pos].director);
+                newDirectorCell.appendChild(newDirectorText);
+
+                let newLengthText  = document.createTextNode(movieListArr[pos].length);
+                newLengthCell.appendChild(newLengthText);
+
+                let newWatchedText  = document.createTextNode((movieListArr[pos].watched ? "watched" : "not watched"));
+                newWatchedCell.appendChild(newWatchedText);
+
+                let btn = document.createElement("BUTTON");
+                btn.innerHTML = "Delete";
+                btn.addEventListener('click', deleteMovie);
+                newDeleteCell.appendChild(btn);
+            }
+         // Loads any movies you had on page load
+         loadMovies()    
+      //Delete a movie when the movie button is clicked      
+      function deleteMovie(e) {
+        let id = e.target.parentElement.parentElement.getAttribute("id");
+                  let removalNode = e.target.parentElement.parentElement;
+                  e.target.parentElement.parentElement.parentElement.removeChild(removalNode);
+                  console.log(e.target.parentElement.parentElement.getElementsByTagName('td')[0]);
+                  
+                  for (let i =0; i<movieListArr.length; i++) {
+                    if (movieListArr[i].id == id) {
+                      console.log(movieListArr[i])
+                      movieListArr.splice(i,1);
+                    }
+                  }
+              }   
+
+
+
+      function Movie(name, director, length, watched, id) {
+        this.name = name;
+        this.director = director;
+        this.length = length;
+        this.watched = watched;
+        this.id = id;
+      }
+
+
+      let myLibrary = [];
+
+      function addBookToLibrary() {
+        // do stuff here
+      }
+
+      function render() {
+        // renders the book on the page
+      }
+    </script>
+  </body>
+</html>
